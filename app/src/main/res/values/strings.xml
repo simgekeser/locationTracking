@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">androidTask</string>
+    <string name="facebook_app_id">545026826199203</string>
+    <string name="fb_login_protocol_scheme">fb545026826199203</string>
+    <string name="map_key" translatable="false">AIzaSyAcTln70Y73dDaB0M7qQRoBDsYMSuXn2p0</string>
+
+</resources>
