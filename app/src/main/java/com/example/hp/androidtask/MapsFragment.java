@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import com.facebook.FacebookSdk;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,7 +37,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback{
+public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private LocationListener mLocationListener;
@@ -46,8 +47,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
     private final static int REQUEST_CODE = 1001;
     protected Activity mActivity;
     private String profilPicUrl;
-
-
+    SeekBar seekbar;
+    private int customDistance=3;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,7 +57,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
         View view = inflater.inflate(R.layout.fragment_map, null, false);
         MainActivity mainActivity = (MainActivity) getActivity();
         profilPicUrl = mainActivity.getProfilPicUrl();
-
+        seekbar = (SeekBar) view.findViewById(R.id.seekBar);
+        seekbar.setProgress(customDistance);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         if(mGoogleApiClient==null){
             initGoogleApiClient(getContext());
@@ -69,6 +71,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                customDistance=i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         return view;
 
         //  user.setText(profilPicUrl);
@@ -110,7 +129,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
 
             @Override
             public void onConnectionSuspended(int i) {
-                Log.i("LOG_TAG", "onConnectionSuspended");
+               // Log.i("LOG_TAG", "onConnectionSuspended");
             }
         }).build();
     }
@@ -124,7 +143,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                     // Log.i("LOG_TAG", "Latitude = " + lat + " Longitude = " + lon);
                     mMap.clear();
                     addMarker(location);
-                    if (currentLocation.distanceTo(location) > 7) {
+                    if (currentLocation.distanceTo(location) > customDistance) {
                         // Toast.makeText(mActivity,"2'yi geçti",Toast.LENGTH_LONG).show();
                         new AlertDialog.Builder(mActivity)
                                 .setTitle("WARNING")
@@ -132,10 +151,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                                 .setCancelable(true)
                                 .show();
 
-                        // Log.i("distance", Float.toString(currentLocation.distanceTo(location)));
+                         //Log.i("distance", Float.toString(currentLocation.distanceTo(location)));
                         // Log.i("current", currentLocation.getLatitude() + "  " + currentLocation.getLongitude());
                         //Log.i("updatedLocation", location.getLatitude() + "  " + location.getLongitude());
                     }
+                    Log.i("distanceCustom",customDistance+"");
                     Log.i("distance", Float.toString(location.distanceTo(currentLocation)));
                 }
             }
@@ -169,7 +189,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
                 .title("My position")
-                .snippet(location.getLatitude() + "  " + location.getLongitude())
+                .snippet(location.getLatitude() + " , " + location.getLongitude())
                 .icon(BitmapDescriptorFactory.fromBitmap(new CustomMarker(getContext(), profilPicUrl).createUserBitmap()))
                 .anchor(0.5f, 1));
         marker.showInfoWindow();
@@ -196,4 +216,5 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
     private void removeLocationListener() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, mLocationListener);
     }
+
 }

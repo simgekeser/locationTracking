@@ -5,10 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".MapsFragment">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,4 +12,23 @@
         android:name="com.google.android.gms.maps.SupportMapFragment">
     </fragment>
 
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="#FAE8FE"
+        android:max="15"
+        android:paddingTop="30dp"
+        android:paddingBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_gravity="end"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:text="Change Distance"
+        android:gravity="center"
+        android:padding="4dp"
+        android:paddingTop="15dp"/>
 </FrameLayout>

@@ -1,5 +1,6 @@
 package com.example.hp.androidtask;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -39,13 +40,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     LoginButton fbLoginButton;
+    ProgressDialog mDailog;
 
     private AccessTokenTracker accessTokenTracker;
     private static final int RC_SIGN_IN = 9001;
     private SignInButton googleSignInButton;
 
     public static GoogleApiClient mGoogleApiClient;
-    private final static String TAG="logiiiiiin";
+    private final static String TAG="login";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,9 +79,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         });
         fbLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG,"başarıllı"+loginResult);
-                handleFacebookToken(loginResult.getAccessToken());
+            public void onSuccess(final LoginResult loginResult) {
+                Log.d(TAG,"başarılı"+loginResult);
+                mDailog = ProgressDialog.show(LoginActivity.this, "",
+                        "Redirecting To Location Tracking ", true);
+                mDailog.show();
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            handleFacebookToken(loginResult.getAccessToken());
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
             }
 
             @Override
@@ -115,10 +131,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     }
 
-    private void signInGoogle() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
 
     private void handleFacebookToken(AccessToken accessToken) {
 
@@ -137,7 +149,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         );
 
     }
-
+    private void fbLoginNewActiviy(FirebaseUser user) {
+        if(user != null){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("username",user.getDisplayName());
+            intent.putExtra("profilPic",String.valueOf(user.getPhotoUrl()));
+            startActivity(intent);
+        }
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -156,14 +175,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         }
     }
-    private void fbLoginNewActiviy(FirebaseUser user) {
-        if(user != null){
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("username",user.getDisplayName());
-            intent.putExtra("profilPic",String.valueOf(user.getPhotoUrl()));
-            startActivity(intent);
-        }
+    private void signInGoogle() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         // Log.d(TAG, "firebaseAuthWithGooogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);

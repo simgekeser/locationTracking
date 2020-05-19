@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-        //  user = findViewById(R.id.textView_username);
 
         BottomNavigationView bottomNav = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
